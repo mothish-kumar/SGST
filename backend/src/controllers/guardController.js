@@ -110,7 +110,7 @@ export const guardLogin = async(req,res)=>{
             secure: process.env.NODE_ENV === "production",
             maxAge: 3600000
         });
-        res.status(200).json({message: "Login successful"});
+        res.status(200).json({message: "Login successful",token,id:guard._id});
     }catch(error){
         res.status(500).json({message: error.message});
     }
@@ -137,11 +137,7 @@ export const getGuards = async (req, res) => {
 }
 
 export const getGuardById = async (req, res) => {
-    const { id } = req.params;
-    const role = req.role
-    if(role !== "admin"){
-        return res.status(401).json({message: "No Permission access for this route"});
-    }
+    const { id } = req.params;  
     try {
         const guard = await Guard.findById(id);
         if (!guard) {
@@ -230,29 +226,37 @@ export const deleteGuard = async (req, res) => {
 }
 
 export const getAssignedWork = async (req, res) => {
-    const role = req.role
-    const id = req.id
-    if(role !== "guard"){
-        return res.status(401).json({message: "No Permission access for this route"});
+    const role = req.role;
+    const id = req.id;
+    const shift_status = req.query.status || "Pending"; // Get status from query params, default "Pending"
+
+    if (role !== "guard") {
+        return res.status(401).json({ message: "No Permission access for this route" });
     }
-    try{
+
+    try {
         const guard = await Guard.findById(id).populate({
             path: "assigned_work.booking_id",
             model: "Booking",
-            select: "client_name client_email client_phone address" 
+            select: "client_name client_email client_phone address shift_status",
         });
+
         if (!guard) {
             return res.status(404).json({ message: "Guard not found" });
         }
-        const assignedWork = guard.assigned_work;
+
+        const assignedWork = guard.assigned_work.filter(work => work.shift_status === shift_status); // Filter based on query param
+
         if (assignedWork.length === 0) {
-            return res.status(404).json({ message: "No assigned work found" });
+            return res.status(404).json({ message: `No assigned work found for status: ${shift_status}` });
         }
+
         res.status(200).json(assignedWork);
-    }catch(error){
-        res.status(500).json({message: error.message});
+    } catch (error) {
+        res.status(500).json({ message: error.message });
     }
-}
+};
+
 
 export const startWork = async (req, res) => {
     try{

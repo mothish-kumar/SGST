@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Lobster&display=swap');
+:root {
+  /* Light Theme */
+  --primary-color: #2C3E50;
+  --secondary-color: #1ABC9C;
+  --background-color: #ECF0F1;
+  --card-background: #FFFFFF;
+  --text-color: #2C3E50;
+  --success-color: #27AE60;
+  --error-color: #E74C3C;
+}
+
+/* Dark Theme */
+[data-theme='dark'] {
+  --primary-color: #3498DB;
+  --secondary-color: #16A085;
+  --background-color: #2C3E50;
+  --card-background: #34495E;
+  --text-color: #ECF0F1;
+  --success-color: #2ECC71;
+  --error-color: #C0392B;
+}
+
+/* Global Typography */
+body {
+  font-family: 'Mochiy Pop One', system-ui, Avenir, Helvetica, Arial, sans-serif !important;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+}

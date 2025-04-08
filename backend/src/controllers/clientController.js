@@ -47,3 +47,15 @@ export const feedBack = async (req, res) => {
         res.status(500).json({message: error.message})
     }
 }
+
+export const feedbacks = async (req, res) => {
+    try {
+        const allFeedbacks = await Booking.find(
+            { client_feedback: { $exists: true } },
+            { client_feedback: 1, name: 1, email: 1 } 
+        );
+        res.status(200).json(allFeedbacks);
+    } catch (error) {
+        res.status(500).json({ message: error.message });
+    }
+};

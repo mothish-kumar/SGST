@@ -17,10 +17,12 @@ export const adminLogin = (req, res) => {
         const token  = jwt.sign({email,role:'admin'}, process.env.JWT_SECRET, {expiresIn: '1h'})
         res.cookie("token", token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            maxAge: 3600000
+            secure: false,
+            sameSite: "Lax",
+            maxAge: 3600000,
+            path: "/"
         });
-        res.status(200).json({message: 'Login successful'})
+        res.status(200).json({message: 'Login successful',token})
     }catch(error){
         res.status(500).json({message: 'Internal server error'})
     }

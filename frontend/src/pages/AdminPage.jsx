@@ -3,6 +3,9 @@ import AdminDashboard from '../components/AdminDashBoard'
 import SecurityGuards from '../components/SecurityGuards';
 import Bookings from '../components/Bookings';
 import Sidebar from '../components/SlideBar';
+import Payment from '../components/Payment';
+import Progress from '../components/Progress'
+import Track from '../components/Track'
 
 const AdminPage = () => {
   const [selectedMenu, setSelectedMenu] = useState("Dashboard");
@@ -13,6 +16,12 @@ const AdminPage = () => {
         return <SecurityGuards />;
       case "Bookings":
         return <Bookings />;
+      case "Payment":
+          return <Payment/>
+      case "Progress":
+          return <Progress/>
+      case "Track":
+          return <Track/>
       default:
         return <AdminDashboard />;
     }

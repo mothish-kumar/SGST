@@ -8,12 +8,18 @@ import {
   Toolbar,
 } from "@mui/material";
 import { Dashboard, Security, Receipt } from "@mui/icons-material";
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import DonutSmallIcon from '@mui/icons-material/DonutSmall';
+import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
 
 const Sidebar = ({ setSelectedMenu }) => {
   const menuItems = [
     { text: "Dashboard", icon: <Dashboard />, component: "Dashboard" },
     { text: "Security Guards", icon: <Security />, component: "SecurityGuards" },
     { text: "Bookings", icon: <Receipt />, component: "Bookings" },
+    {text:"Payment",icon:<AccountBalanceIcon/>,component:"Payment"},
+    {text:"Progress",icon:<DonutSmallIcon/>,component:"Progress"},
+    {text:"Track",icon:<AddLocationAltIcon/>,component:"Track"}
   ];
 
   return (

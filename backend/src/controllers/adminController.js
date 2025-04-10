@@ -153,6 +153,14 @@ export const getWorkStatus = async (req, res) => {
         res.status(500).json({message: 'Internal server error'})
     }
 }
+export const UnPaidPaymentList = async(req,res)=>{
+    try{
+        const booking = await Booking.find({payment_status : "Unpaid"})
+        res.status(201).json(booking)
+    }catch(error){
+        res.status(500).json({message:"Internal Server Error"})
+    }
+}
 
 export const sendPaymentQR = async (req, res) => {
     const { bookingId } = req.params;

@@ -161,7 +161,6 @@ export const approveGuard = async (req, res) => {
             return res.status(404).json({ message: "Guard not found" });
         }
         const plainPassword = `${guard.email.split("@")[0]}_SG${Date.now().toString().slice(-4)}`;
-        console.log(plainPassword);
         const hashedPassword = await bcrypt.hash(plainPassword, 10);
         guard.status = "Approved";
         guard.password = hashedPassword;

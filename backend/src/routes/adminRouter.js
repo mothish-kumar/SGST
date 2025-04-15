@@ -1,5 +1,5 @@
 import express from 'express'
-import { adminLogin,getAllBookings,acceptBooking, rejectBooking, sendPaymentQR, markPaymentAsPaid, getWorkStatus, getDashboardData, UnPaidPaymentList } from '../controllers/adminController.js'
+import { adminLogin,getAllBookings,acceptBooking, rejectBooking, sendPaymentQR, markPaymentAsPaid, getWorkStatus, getDashboardData, UnPaidPaymentList, schedule, calculatedSalary, markSalaryAsPaid } from '../controllers/adminController.js'
 import {authMiddleware} from '../middlewares/authMiddleware.js'
 import { getGuards, approveGuard, rejectGuard, deleteGuard, getGuardById } from '../controllers/guardController.js'
 const router = express.Router()
@@ -18,4 +18,7 @@ router.post('/sendPaymentMail/:bookingId',authMiddleware,sendPaymentQR)
 router.post('/sendPaymentCompleteMail/:bookingId',authMiddleware,markPaymentAsPaid)
 router.get('/getDashboardData',authMiddleware,getDashboardData) 
 router.get('/paymentList',authMiddleware,UnPaidPaymentList)
+router.get('/getSchedule',authMiddleware,schedule)
+router.get('/calculateSalary',authMiddleware,calculatedSalary)
+router.put('/markAsPaid/:guardId',authMiddleware,markSalaryAsPaid)
 export default router 

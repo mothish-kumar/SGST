@@ -278,3 +278,92 @@ export const getDashboardData = async (req, res) => {
     }
 };
 
+export const schedule = async(req,res)=>{
+    try{
+        const guards = await Guard.find({},"_id name assigned_work payment_details  salary ").lean()
+        const schedule = guards.map((guard) => ({
+            guard_id:guard._id,
+            guard_name: guard.name,
+            assigned_work: guard.assigned_work.filter((work) =>
+                ["Pending", "Ongoing"].includes(work.shift_status)
+            ).map((work) => ({
+                client_name: work.client_name,
+                location: work.location,
+                shift: work.shift,
+                attendance_status: work.attendance_status,
+                shift_status: work.shift_status,
+            })),
+            total_earnings : guard.payment_details.total_earnings,
+            last_payment_date : guard.payment_details.last_payment_date,
+            salary : guard.salary
+        }));
+          res.status(200).json({schedule})
+    }catch(error){
+        res.status(500).json({message:'Faile to get Schedule'})
+    }
+    
+}
+
+export const calculatedSalary = async (req, res) => {
+    try {
+      // Fetch guards without using .lean() to get Mongoose documents
+      const guards = await Guard.find({}, "name assigned_work salary salary_paid");
+  
+      // Iterate through guards and calculate salary
+      const updatedGuards = await Promise.all(
+        guards.map(async (guard) => {
+          const unpaidCompletedShifts = guard.assigned_work.filter(
+            (work) => work.shift_status === "Completed" && !work.paid
+          );
+  
+          const completedShifts = unpaidCompletedShifts.length;
+          const ratePerShift = 700; // Example rate per shift
+          const calculatedSalary = completedShifts * ratePerShift;
+  
+          // Update the salary field in the database
+          guard.salary = calculatedSalary;
+          await guard.save(); // Save the updated guard document
+  
+          return {
+            guard_id: guard._id,
+            guard_name: guard.name,
+            completed_shifts: completedShifts,
+            salary: calculatedSalary,
+            salary_paid: guard.salary_paid,
+          };
+        })
+      );
+  
+      res.status(200).json(updatedGuards);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to calculate salary", error: error.message });
+    }
+  };
+
+export const markSalaryAsPaid = async (req, res) => {
+    const { guardId } = req.params;
+  
+    try {
+      const guard = await Guard.findById(guardId);
+      if (!guard) {
+        return res.status(404).json({ message: "Guard not found" });
+      }
+  
+      // Mark all unpaid completed shifts as paid
+      guard.assigned_work.forEach((work) => {
+        if (work.shift_status === "Completed" && !work.paid) {
+          work.paid = true;
+        }
+      });
+  
+      guard.salary_paid = true; 
+      guard.payment_details.total_earnings += guard.salary;
+      guard.payment_details.last_payment_date = new Date(); 
+      guard.salary = 0;
+      await guard.save();
+  
+      res.status(200).json({ message: "Salary marked as paid successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to mark salary as paid", error: error.message });
+    }
+  };

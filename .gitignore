@@ -6,3 +6,4 @@ backend/uploads
 frontend/node_modules
 frontend/.env
 frontend/package-lock.json
+.qodo

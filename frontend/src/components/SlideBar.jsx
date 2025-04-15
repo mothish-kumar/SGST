@@ -11,11 +11,15 @@ import { Dashboard, Security, Receipt } from "@mui/icons-material";
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import DonutSmallIcon from '@mui/icons-material/DonutSmall';
 import AddLocationAltIcon from '@mui/icons-material/AddLocationAlt';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import CurrencyRupeeIcon from '@mui/icons-material/CurrencyRupee';
 
 const Sidebar = ({ setSelectedMenu }) => {
   const menuItems = [
     { text: "Dashboard", icon: <Dashboard />, component: "Dashboard" },
     { text: "Security Guards", icon: <Security />, component: "SecurityGuards" },
+    {text:'Schedule',icon:<CalendarMonthIcon/>,component:'Schedule'},
+    {text:'Salary Management',icon:<CurrencyRupeeIcon/>,component:'SalaryManagement'},
     { text: "Bookings", icon: <Receipt />, component: "Bookings" },
     {text:"Payment",icon:<AccountBalanceIcon/>,component:"Payment"},
     {text:"Progress",icon:<DonutSmallIcon/>,component:"Progress"},

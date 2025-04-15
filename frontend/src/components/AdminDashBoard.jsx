@@ -54,12 +54,12 @@ const AdminDashboard = () => {
         }}
       >
         {[
-          { label: "Total Clients", value: dashboardData.totalClients },
           { label: "Total Security Guards", value: dashboardData.totalGuards },
           { label: "Total Bookings", value: dashboardData.totalBookings },
-          { label: "Ongoing Works", value: dashboardData.ongoingWorks },
+          { label: "Pending Bookings", value: dashboardData.pendingBookings }, 
+          { label: "Ongoing Bookings", value: dashboardData.ongoingWorks },
+          { label: "Completed Bookings", value: dashboardData.completedWorks },
           { label: "Pending Payments", value: dashboardData.pendingPayments },
-          { label: "Completed Payments", value: dashboardData.completedPayments },
         ].map((item, index) => (
           <motion.div
             key={index}

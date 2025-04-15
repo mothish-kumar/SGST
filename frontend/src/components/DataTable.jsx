@@ -13,59 +13,67 @@ import {
 import { motion } from "framer-motion";
 import axiosInstance from "../Network/axiosInstance";
 import {toast} from 'sonner'
-import io from "socket.io-client";
+import {connectSocket,getSocket,disconnectSocket} from "../Network/socket";
 
-const DataTable = ({ data }) => {
+const DataTable = ({ data,fetchData }) => {
   const [expandedRow, setExpandedRow] = useState(null);
-  const [socket, setSocket] = useState(null);
   const guardId = localStorage.getItem("guardId")
   const [loading,setLoading] = useState(false)
 
-  const handleStartWork =async (booking_id) =>{
+  const handleStartWork = async (booking_id) => {
     if (!navigator.geolocation) {
-        toast.error("Geolocation is not supported by your browser.");
-        return;
-      }
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const lat = position.coords.latitude;
-          const lng = position.coords.longitude;
-    
-          try {
-            // API call to start work (only once)
-            await axiosInstance.post(`/guard/startWork/${booking_id}`,{lat,lng})
-    
-            toast.success("Work started successfully!");
-    
-            // Connect to WebSocket
-            const newSocket = io("http://localhost:6000");
-            setSocket(newSocket);
-    
-            // Send initial location update
-            newSocket.emit("guardLocation", { guardId, lat, lng });
-    
-            // Continuously send live location updates via WebSocket
-            navigator.geolocation.watchPosition((pos) => {
+      toast.error("Geolocation is not supported by your browser.");
+      return;
+    }
+  
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+  
+        try {
+          await axiosInstance.post(`/guard/startWork/${booking_id}`, { lat, lng });
+  
+          toast.success("Work started successfully!");
+  
+          let socket = getSocket();
+          if (!socket) {
+            socket = connectSocket();
+          }
+  
+          socket.emit("guardLocation", { guardId, lat, lng });
+
+          const intervalId = setInterval(() => {
+            navigator.geolocation.getCurrentPosition((pos) => {
               const newLat = pos.coords.latitude;
               const newLng = pos.coords.longitude;
-              newSocket.emit("guardLocation", { guardId, lat: newLat, lng: newLng });
+              socket.emit("guardLocation", { guardId, lat: newLat, lng: newLng });
+              console.log("Sending location to admin:", guardId, newLat, newLng);
             });
-    
-          } catch (error) {
-            console.log(error.message)
-            toast.error("Failed to start work. Please try again.");
-          }
-        },
-        () => {
-          toast.error("Failed to retrieve location.");
+          }, 5000); 
+          
+          
+          fetchData("Pending");
+  
+          window.addEventListener("beforeunload", () => clearInterval(intervalId));
+        } catch (error) {
+          console.log(error.message);
+          toast.error("Failed to start work. Please try again.");
         }
-      )
-  }
+      },
+      () => {
+        toast.error("Failed to retrieve location.");
+      }
+    );
+  };
+  
+
   const handleCompleteWork = async(booking_id)=>{
     setLoading(true)
     try{
         await axiosInstance.post(`/guard/completeWork/${booking_id}`)
         toast.success('Work has been completed')
+        disconnectSocket()
         window.location.reload()
     }catch(error){
         toast.error('Failed to update Complete Work')

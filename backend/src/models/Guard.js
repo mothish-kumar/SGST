@@ -25,6 +25,7 @@ const GuardSchema = new mongoose.Schema(
         shift_status: { type: String, enum: ["Pending", "Ongoing", "Completed"], default: "Pending" },
         start_time: { type: Date }, 
         end_time: { type: Date },
+        paid:{type:Boolean,default:false}
       },
     ],
     rating: { type: Number, default: 0 },
@@ -32,6 +33,8 @@ const GuardSchema = new mongoose.Schema(
       total_earnings: { type: Number, default: 0 },
       last_payment_date: { type: Date },
     },
+    salary:{type:Number,default:0},
+    salary_paid:{type:Boolean,default:false}
   },
   { timestamps: true }
 );

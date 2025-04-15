@@ -21,6 +21,7 @@ const Bookings = () => {
   const [rejectReason, setRejectReason] = useState("");
 const [guardDetails, setGuardDetails] = useState(null);
 const [loadingGuard, setLoadingGuard] = useState(false);
+const [openViewModal,setOpenViewModal] = useState(false)
 
   useEffect(() => {
     fetchBookings();
@@ -54,8 +55,9 @@ const [loadingGuard, setLoadingGuard] = useState(false);
     }
   };
   const handleAcceptBooking = () => {
-    setOpenGuardModal(true);
     fetchGuards();
+    setOpenGuardModal(true);
+
   };
   const handleGuardSelection = (guardId) => {
     setSelectedGuards((prev) =>
@@ -123,8 +125,8 @@ const [loadingGuard, setLoadingGuard] = useState(false);
         })
       );
   
-      setGuardDetails(guardDetailsList); // Store multiple guard details
-      setOpenGuardModal(true);
+      setGuardDetails(guardDetailsList); 
+      setOpenViewModal(true);
     } catch (error) {
       console.error("Error fetching guard details", error);
       toast.error("Failed to fetch guard details.");
@@ -153,7 +155,6 @@ const [loadingGuard, setLoadingGuard] = useState(false);
       ),
     },
   ];
-  console.log("Bookings Data:", bookings);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -170,15 +171,15 @@ const [loadingGuard, setLoadingGuard] = useState(false);
         sx={{
           p: 3,
           bgcolor: "var(--background-color)",
-          width: "90%",   // Responsive width
-          maxWidth: 500,  // Maximum width limit
+          width: "90%",  
+          maxWidth: 500, 
           mx: "auto",
           mt: 5,
           borderRadius: 3,
           boxShadow: "0px 4px 15px rgba(0, 0, 0, 0.2)",
           outline: "none",
-          maxHeight: "80vh",  // Fixed max height
-          overflowY: "auto",  // Enables scrolling
+          maxHeight: "80vh",  
+          overflowY: "auto",  
         }}
       >
         {selectedBooking && (
@@ -328,7 +329,7 @@ const [loadingGuard, setLoadingGuard] = useState(false);
   </Box>
 </Modal>
 {/* View button Modal */}
-<Modal open={openGuardModal} onClose={() => setOpenGuardModal(false)}>
+<Modal open={openViewModal} onClose={() => setOpenViewModal(false)}>
   <Box sx={{ p: 3, bgcolor: "white", width: "90%", maxWidth: 700, mx: "auto", mt: 5, borderRadius: 3 }}>
     <Typography variant="h6" fontWeight="bold">Assigned Guards</Typography>
     <Divider sx={{ my: 2 }} />
@@ -382,7 +383,7 @@ const [loadingGuard, setLoadingGuard] = useState(false);
     )}
 
     <Box display="flex" justifyContent="center" mt={2}>
-      <Button variant="contained" onClick={() => setOpenGuardModal(false)}>
+      <Button variant="contained" onClick={() => setOpenViewModal(false)}>
         Close
       </Button>
     </Box>

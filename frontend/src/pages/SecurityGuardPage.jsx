@@ -1,5 +1,13 @@
 import React, { useEffect, useState } from "react";
-import { Box, Typography, Select, MenuItem } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Select,
+  MenuItem,
+  Avatar,
+  Tooltip,
+  Paper,
+} from "@mui/material";
 import axiosInstance from "../Network/axiosInstance";
 import { toast } from "sonner";
 import DataTable from "../components/DataTable";
@@ -8,9 +16,12 @@ const SecurityGuardPage = () => {
   const [shiftStatus, setShiftStatus] = useState("Pending");
   const [guardData, setGuardData] = useState([]);
   const [noData, setNoData] = useState(false);
+  const [guardProfile, setGuardProfile] = useState(null);
+  const id = localStorage.getItem("guardId");
 
   useEffect(() => {
     fetchGuardData(shiftStatus);
+    fetchGuardProfile();
   }, [shiftStatus]);
 
   const fetchGuardData = async (status) => {
@@ -34,12 +45,75 @@ const SecurityGuardPage = () => {
     }
   };
 
+  const fetchGuardProfile = async () => {
+    try {
+      const res = await axiosInstance.get(`/admin/getGuard/${id}`);
+      setGuardProfile(res.data);
+    } catch (error) {
+      toast.error("Failed to fetch Guard Profile");
+    }
+  };
+
   return (
     <Box sx={{ p: 3, marginTop: "100px" }}>
-      {/* Title */}
-      <Typography variant="h3" fontWeight="bold" mb={2}>
-        Security Guard Shifts
-      </Typography>
+      {/* Top Bar with Profile */}
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={3}
+      >
+        {/* Title */}
+        <Typography variant="h3" fontWeight="bold">
+          Security Guard Shifts
+        </Typography>
+
+        {/* Profile Section */}
+        {guardProfile && (
+          <Tooltip
+            title={
+              <Paper sx={{ p: 2 }}>
+                <Typography variant="body1">
+                  <strong>Total Earnings:</strong> ${guardProfile.payment_details.total_earnings}
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Last Payment Date:</strong>{" "}
+                  {guardProfile.payment_details.last_payment_date
+                    ? new Intl.DateTimeFormat("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      }).format(new Date(guardProfile.payment_details.last_payment_date))
+                    : "N/A"}
+                </Typography>
+              </Paper>
+            }
+            placement="bottom-start"
+            arrow
+          >
+            <Box 
+              display="flex" 
+              alignItems="center" 
+              gap={2} 
+              sx={{ 
+                background: 'linear-gradient(75deg, rgb(4, 11, 78)30%, rgb(0, 59, 252)90%)', 
+                px:3,
+                py:0.5,
+                borderRadius: 5
+              }}
+            >
+              <Avatar
+                src={`http://localhost:5000/uploads/profile_photos/${guardProfile.profile_photo}`} 
+                alt={guardProfile.name}
+                sx={{ width: 56, height: 56 }}
+              />
+              <Typography variant="h6" fontWeight="bold" sx={{color:'white'}}>
+                {guardProfile.name}
+              </Typography>
+            </Box>
+          </Tooltip>
+        )}
+      </Box>
 
       {/* Filter Dropdown */}
       <Box display="flex" alignItems="center" gap={2} mb={3}>
@@ -57,7 +131,7 @@ const SecurityGuardPage = () => {
 
       {/* Data Table or No Data Message */}
       {!noData ? (
-        <DataTable data={guardData} />
+        <DataTable data={guardData} fetchData={fetchGuardData} />
       ) : (
         <Typography variant="h5" textAlign="center">
           No data available for {shiftStatus} shifts

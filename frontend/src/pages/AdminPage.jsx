@@ -6,6 +6,8 @@ import Sidebar from '../components/SlideBar';
 import Payment from '../components/Payment';
 import Progress from '../components/Progress'
 import Track from '../components/Track'
+import Schedule from '../components/Schedule';
+import SalaryManagement from '../components/SalaryManagement';
 
 const AdminPage = () => {
   const [selectedMenu, setSelectedMenu] = useState("Dashboard");
@@ -22,6 +24,10 @@ const AdminPage = () => {
           return <Progress/>
       case "Track":
           return <Track/>
+        case 'Schedule':
+          return <Schedule/>
+          case 'SalaryManagement':
+            return <SalaryManagement/>
       default:
         return <AdminDashboard />;
     }

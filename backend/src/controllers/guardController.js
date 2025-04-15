@@ -330,6 +330,7 @@ export const completeWork = async (req, res) => {
         }
         assignedWork.shift_status = "Completed";
         assignedWork.end_time = new Date();
+        guard.salary_paid = false
         await guard.save();
         await sendMail(
             booking.client_email,
